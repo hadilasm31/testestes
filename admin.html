@@ -1,0 +1,1467 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin - LAMITI SHOP</title>
+    <meta name="description" content="Tableau de bord administrateur pour gérer les produits, commandes et statistiques.">
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Anime.js for animations -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js"></script>
+    
+    <!-- ECharts for data visualization -->
+    <script src="https://cdn.jsdelivr.net/npm/echarts@5.4.3/dist/echarts.min.js"></script>
+    
+    <!-- Custom CSS -->
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&display=swap');
+        
+        :root {
+            --primary-color: #1a1a1a;
+            --secondary-color: #f5f5f5;
+            --accent-color: #d4af37;
+            --text-color: #333333;
+            --bg-color: #fafafa;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            line-height: 1.6;
+        }
+        
+        /* Admin Login */
+        .admin-login {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(135deg, var(--primary-color) 0%, #333 100%);
+        }
+        
+        .login-container {
+            background: white;
+            border-radius: 16px;
+            padding: 3rem;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            max-width: 400px;
+            width: 90%;
+            text-align: center;
+        }
+        
+        .login-title {
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--primary-color);
+            margin-bottom: 1rem;
+        }
+        
+        .login-subtitle {
+            color: #666;
+            margin-bottom: 2rem;
+        }
+        
+        .login-form {
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+        }
+        
+        .form-group {
+            text-align: left;
+        }
+        
+        .form-label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+            color: var(--primary-color);
+        }
+        
+        .form-input {
+            width: 100%;
+            padding: 0.8rem;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: border-color 0.3s ease;
+        }
+        
+        .form-input:focus {
+            outline: none;
+            border-color: var(--accent-color);
+            box-shadow: 0 0 0 2px rgba(212, 175, 55, 0.2);
+        }
+        
+        .login-btn {
+            background: var(--accent-color);
+            color: white;
+            border: none;
+            padding: 1rem;
+            border-radius: 8px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .login-btn:hover {
+            background: #b8941f;
+            transform: translateY(-1px);
+        }
+        
+        /* Admin Dashboard */
+        .admin-dashboard {
+            display: none;
+            min-height: 100vh;
+            background: var(--bg-color);
+        }
+        
+        .admin-header {
+            background: white;
+            padding: 1rem 2rem;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .admin-logo {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--primary-color);
+        }
+        
+        .admin-user {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+        
+        .logout-btn {
+            background: #e74c3c;
+            color: white;
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+        
+        .logout-btn:hover {
+            background: #c0392b;
+        }
+        
+        .admin-container {
+            display: grid;
+            grid-template-columns: 250px 1fr;
+            min-height: calc(100vh - 80px);
+        }
+        
+        @media (max-width: 1024px) {
+            .admin-container {
+                grid-template-columns: 1fr;
+            }
+        }
+        
+        .admin-sidebar {
+            background: white;
+            border-right: 1px solid #eee;
+            padding: 2rem 1rem;
+        }
+        
+        @media (max-width: 1024px) {
+            .admin-sidebar {
+                display: none;
+            }
+        }
+        
+        .sidebar-menu {
+            list-style: none;
+        }
+        
+        .sidebar-item {
+            margin-bottom: 0.5rem;
+        }
+        
+        .sidebar-link {
+            display: block;
+            padding: 0.8rem 1rem;
+            color: var(--text-color);
+            text-decoration: none;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+        }
+        
+        .sidebar-link:hover,
+        .sidebar-link.active {
+            background: var(--accent-color);
+            color: white;
+        }
+        
+        .admin-main {
+            padding: 2rem;
+        }
+        
+        @media (max-width: 768px) {
+            .admin-main {
+                padding: 1rem;
+            }
+        }
+        
+        .dashboard-section {
+            display: none;
+        }
+        
+        .dashboard-section.active {
+            display: block;
+        }
+        
+        .section-title {
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--primary-color);
+            margin-bottom: 2rem;
+        }
+        
+        /* Classes utilitaires */
+        .font-semibold {
+            font-weight: 600;
+        }
+        
+        .text-gray-600 {
+            color: #666;
+        }
+        
+        .text-red-600 {
+            color: #e74c3c;
+        }
+        
+        .text-sm {
+            font-size: 0.875rem;
+        }
+        
+        .capitalize {
+            text-transform: capitalize;
+        }
+        
+        .space-y-4 > * + * {
+            margin-top: 1rem;
+        }
+        
+        .space-y-2 > * + * {
+            margin-top: 0.5rem;
+        }
+        
+        .mt-4 {
+            margin-top: 1rem;
+        }
+        
+        .mt-6 {
+            margin-top: 1.5rem;
+        }
+        
+        .mb-2 {
+            margin-bottom: 0.5rem;
+        }
+        
+        .mb-3 {
+            margin-bottom: 0.75rem;
+        }
+        
+        .flex-1 {
+            flex: 1;
+        }
+        
+        .flex {
+            display: flex;
+        }
+        
+        .gap-4 {
+            gap: 1rem;
+        }
+        
+        .text-right {
+            text-align: right;
+        }
+        
+        .grid {
+            display: grid;
+        }
+        
+        .grid-cols-2 {
+            grid-template-columns: repeat(2, 1fr);
+        }
+        
+        .text-center {
+            text-align: center;
+        }
+        
+        .font-mono {
+            font-family: monospace;
+        }
+        
+        /* Stats Cards */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+        
+        .stat-card {
+            background: white;
+            padding: 2rem;
+            border-radius: 16px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+            text-align: center;
+            transition: all 0.3s ease;
+        }
+        
+        .stat-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.12);
+        }
+        
+        .stat-icon {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+        }
+        
+        .stat-value {
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--primary-color);
+            margin-bottom: 0.5rem;
+        }
+        
+        .stat-label {
+            color: #666;
+            font-size: 0.95rem;
+        }
+        
+        /* Charts */
+        .chart-container {
+            background: white;
+            border-radius: 16px;
+            padding: 2rem;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+            margin-bottom: 2rem;
+        }
+        
+        .chart-title {
+            font-size: 1.3rem;
+            font-weight: 600;
+            color: var(--primary-color);
+            margin-bottom: 1.5rem;
+        }
+        
+        .chart {
+            width: 100%;
+            height: 400px;
+        }
+        
+        /* Products Management */
+        .products-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+        
+        @media (max-width: 768px) {
+            .products-header {
+                flex-direction: column;
+                align-items: stretch;
+            }
+        }
+        
+        .add-product-btn {
+            background: var(--accent-color);
+            color: white;
+            border: none;
+            padding: 0.8rem 1.5rem;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .add-product-btn:hover {
+            background: #b8941f;
+            transform: translateY(-1px);
+        }
+        
+        .search-input {
+            padding: 0.8rem;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: border-color 0.3s ease;
+            min-width: 300px;
+        }
+        
+        .search-input:focus {
+            outline: none;
+            border-color: var(--accent-color);
+            box-shadow: 0 0 0 2px rgba(212, 175, 55, 0.2);
+        }
+        
+        .products-table {
+            background: white;
+            border-radius: 16px;
+            overflow: hidden;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+            margin-bottom: 2rem;
+        }
+        
+        .table-header {
+            background: #f8f9fa;
+            padding: 1rem 2rem;
+            font-weight: 600;
+            color: var(--primary-color);
+            display: grid;
+            grid-template-columns: 80px 2fr 1fr 1fr 1fr 1fr 150px;
+            gap: 1rem;
+            align-items: center;
+        }
+        
+        .table-row {
+            padding: 1rem 2rem;
+            border-bottom: 1px solid #eee;
+            display: grid;
+            grid-template-columns: 80px 2fr 1fr 1fr 1fr 1fr 150px;
+            gap: 1rem;
+            align-items: center;
+            transition: background-color 0.3s ease;
+        }
+        
+        .table-row:hover {
+            background: #f8f9fa;
+        }
+        
+        .table-row:last-child {
+            border-bottom: none;
+        }
+        
+        @media (max-width: 1024px) {
+            .table-header,
+            .table-row {
+                grid-template-columns: 80px 1fr 1fr 100px;
+                gap: 0.5rem;
+                padding: 1rem;
+            }
+            
+            .table-header > div:nth-child(4),
+            .table-row > div:nth-child(4),
+            .table-header > div:nth-child(5),
+            .table-row > div:nth-child(5),
+            .table-header > div:nth-child(6),
+            .table-row > div:nth-child(6) {
+                display: none;
+            }
+        }
+        
+        @media (max-width: 768px) {
+            .table-header,
+            .table-row {
+                grid-template-columns: 1fr;
+                gap: 0.5rem;
+            }
+            
+            .table-header {
+                display: none;
+            }
+            
+            .table-row {
+                padding: 1rem;
+                margin-bottom: 1rem;
+                border-radius: 8px;
+                box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+                border: none;
+            }
+        }
+        
+        .table-image {
+            width: 60px;
+            height: 60px;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+        
+        .table-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        
+        .table-actions {
+            display: flex;
+            gap: 0.5rem;
+        }
+        
+        .action-btn {
+            padding: 0.5rem;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 0.8rem;
+        }
+        
+        .edit-btn {
+            background: #3498db;
+            color: white;
+        }
+        
+        .edit-btn:hover {
+            background: #2980b9;
+        }
+        
+        .delete-btn {
+            background: #e74c3c;
+            color: white;
+        }
+        
+        .delete-btn:hover {
+            background: #c0392b;
+        }
+        
+        .toggle-btn {
+            background: #95a5a6;
+            color: white;
+        }
+        
+        .toggle-btn.active {
+            background: #27ae60;
+        }
+        
+        /* Category Management */
+        .category-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            margin-bottom: 2rem;
+        }
+        
+        .category-card {
+            background: white;
+            border-radius: 16px;
+            padding: 2rem;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+            transition: all 0.3s ease;
+        }
+        
+        .category-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.12);
+        }
+        
+        .category-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+        
+        .category-name {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: var(--primary-color);
+        }
+        
+        .category-actions {
+            display: flex;
+            gap: 0.5rem;
+        }
+        
+        .category-image {
+            position: relative;
+            width: 100%;
+            height: 150px;
+            border-radius: 8px;
+            overflow: hidden;
+            margin-bottom: 1rem;
+        }
+        
+        .category-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        
+        .category-image-actions {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+        
+        .category-card:hover .category-image-actions {
+            opacity: 1;
+        }
+        
+        .subcategories {
+            margin-top: 1rem;
+        }
+        
+        .subcategory-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            margin-top: 0.5rem;
+        }
+        
+        .subcategory-tag {
+            background: #f0f0f0;
+            padding: 0.25rem 0.5rem;
+            border-radius: 12px;
+            font-size: 0.8rem;
+            display: flex;
+            align-items: center;
+            gap: 0.25rem;
+        }
+        
+        .subcategory-tag .remove-subcategory {
+            background: none;
+            border: none;
+            color: #e74c3c;
+            cursor: pointer;
+            font-size: 0.7rem;
+            padding: 0;
+            width: 16px;
+            height: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .add-subcategory-form {
+            margin-top: 1rem;
+            display: flex;
+            gap: 0.5rem;
+        }
+        
+        .add-subcategory-input {
+            flex: 1;
+            padding: 0.5rem;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 0.9rem;
+        }
+        
+        .add-subcategory-btn {
+            background: var(--accent-color);
+            color: white;
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.9rem;
+        }
+        
+        /* Add Product Modal */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 2000;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s ease;
+            padding: 1rem;
+        }
+        
+        .modal-overlay.active {
+            opacity: 1;
+            visibility: visible;
+        }
+        
+        .modal-content {
+            background: white;
+            border-radius: 16px;
+            padding: 2rem;
+            max-width: 800px;
+            width: 100%;
+            max-height: 90vh;
+            overflow-y: auto;
+            transform: scale(0.9);
+            transition: transform 0.3s ease;
+            position: relative;
+        }
+        
+        @media (max-width: 768px) {
+            .modal-content {
+                padding: 1.5rem;
+                max-height: 95vh;
+            }
+        }
+        
+        .modal-overlay.active .modal-content {
+            transform: scale(1);
+        }
+        
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+        }
+        
+        .modal-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--primary-color);
+        }
+        
+        .modal-close {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: #999;
+            padding: 0.5rem;
+            border-radius: 4px;
+            transition: all 0.3s ease;
+        }
+        
+        .modal-close:hover {
+            background: #f5f5f5;
+        }
+        
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+        }
+        
+        @media (max-width: 768px) {
+            .form-row {
+                grid-template-columns: 1fr;
+            }
+        }
+        
+        .form-textarea {
+            min-height: 100px;
+            resize: vertical;
+        }
+        
+        .image-upload {
+            border: 2px dashed #ddd;
+            border-radius: 8px;
+            padding: 2rem;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .image-upload:hover {
+            border-color: var(--accent-color);
+            background: #f8f9fa;
+        }
+        
+        .image-upload.dragover {
+            border-color: var(--accent-color);
+            background: rgba(212, 175, 55, 0.1);
+        }
+        
+        .uploaded-images {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+        
+        .uploaded-image {
+            position: relative;
+            width: 100px;
+            height: 100px;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+        
+        .uploaded-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        
+        .remove-image {
+            position: absolute;
+            top: 4px;
+            right: 4px;
+            background: rgba(0, 0, 0, 0.7);
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 24px;
+            height: 24px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        /* Order Management */
+        .order-status {
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            text-align: center;
+        }
+        
+        .status-pending {
+            background: #fff3cd;
+            color: #856404;
+        }
+        
+        .status-confirmed {
+            background: #d4edda;
+            color: #155724;
+        }
+        
+        .status-shipped {
+            background: #cce5ff;
+            color: #004085;
+        }
+        
+        .status-delivered {
+            background: #d1ecf1;
+            color: #0c5460;
+        }
+        
+        .status-cancelled {
+            background: #f8d7da;
+            color: #721c24;
+        }
+        
+        .order-details-modal {
+            max-width: 900px;
+        }
+        
+        .order-info {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+            margin-bottom: 2rem;
+        }
+        
+        @media (max-width: 768px) {
+            .order-info {
+                grid-template-columns: 1fr;
+                gap: 1rem;
+            }
+        }
+        
+        .order-section {
+            background: #f8f9fa;
+            padding: 1.5rem;
+            border-radius: 8px;
+        }
+        
+        .order-items {
+            margin-top: 2rem;
+        }
+        
+        .order-item {
+            display: flex;
+            gap: 1rem;
+            padding: 1rem 0;
+            border-bottom: 1px solid #eee;
+        }
+        
+        .order-item:last-child {
+            border-bottom: none;
+        }
+        
+        .order-item-image {
+            width: 60px;
+            height: 60px;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+        
+        .order-item-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        
+        /* Customer Management */
+        .customer-stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+        
+        .customer-stat {
+            background: #f8f9fa;
+            padding: 1rem;
+            border-radius: 8px;
+            text-align: center;
+        }
+        
+        .customer-stat-value {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--accent-color);
+        }
+        
+        .customer-stat-label {
+            font-size: 0.9rem;
+            color: #666;
+        }
+        
+        /* Responsive Design */
+        @media (max-width: 1024px) {
+            .stats-grid {
+                grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            }
+        }
+        
+        @media (max-width: 768px) {
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .chart {
+                height: 300px;
+            }
+        }
+        
+        /* Loading Animation */
+        .loading {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            border-top-color: white;
+            animation: spin 1s ease-in-out infinite;
+        }
+        
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        
+        /* Notifications */
+        .notification {
+            position: fixed;
+            top: 100px;
+            right: 20px;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            transform: translateX(400px);
+            transition: transform 0.3s ease;
+            z-index: 2000;
+            max-width: 350px;
+        }
+        
+        .notification.show {
+            transform: translateX(0);
+        }
+        
+        .notification-content {
+            padding: 1rem 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+        
+        .notification-success {
+            border-left: 4px solid #27ae60;
+        }
+        
+        .notification-error {
+            border-left: 4px solid #e74c3c;
+        }
+        
+        .notification-info {
+            border-left: 4px solid #3498db;
+        }
+        
+        .notification-close {
+            background: none;
+            border: none;
+            font-size: 1.2rem;
+            cursor: pointer;
+            color: #999;
+            padding: 0;
+            margin-left: auto;
+        }
+        
+        /* Stock Management */
+        .stock-input {
+            width: 60px;
+            padding: 4px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            text-align: center;
+        }
+        
+        .update-stock-btn {
+            background: #27ae60;
+            color: white;
+            border: none;
+            padding: 4px 8px;
+            border-radius: 4px;
+            cursor: pointer;
+            margin-left: 5px;
+        }
+        
+        .update-stock-btn:hover {
+            background: #219a52;
+        }
+    </style>
+</head>
+<body>
+    <!-- Admin Login -->
+    <div class="admin-login" id="admin-login">
+        <div class="login-container">
+            <h1 class="login-title">Admin LAMITI SHOP</h1>
+            <p class="login-subtitle">Connectez-vous pour accéder au tableau de bord</p>
+            
+            <form class="login-form" id="admin-login-form">
+                <div class="form-group">
+                    <label class="form-label" for="admin-username">Nom d'utilisateur</label>
+                    <input type="text" id="admin-username" class="form-input" placeholder="admin" required>
+                </div>
+                <div class="form-group">
+                    <label class="form-label" for="admin-password">Mot de passe</label>
+                    <input type="password" id="admin-password" class="form-input" placeholder="lamiti2024" required>
+                </div>
+                <button type="button" class="login-btn" onclick="adminManager.handleAdminLogin()">Se connecter</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Admin Dashboard -->
+    <div class="admin-dashboard" id="admin-dashboard">
+        <!-- Header -->
+        <header class="admin-header">
+            <div class="admin-logo">LAMITI SHOP - Admin</div>
+            <div class="admin-user">
+                <span>Administrateur</span>
+                <button class="logout-btn" onclick="adminManager.logout()">Déconnexion</button>
+            </div>
+        </header>
+
+        <!-- Main Container -->
+        <div class="admin-container">
+            <!-- Sidebar -->
+            <aside class="admin-sidebar">
+                <ul class="sidebar-menu">
+                    <li class="sidebar-item">
+                        <a href="#" class="sidebar-link active" onclick="showSection('dashboard')">
+                            📊 Tableau de bord
+                        </a>
+                    </li>
+                    <li class="sidebar-item">
+                        <a href="#" class="sidebar-link" onclick="showSection('products')">
+                            🛍️ Produits
+                        </a>
+                    </li>
+                    <li class="sidebar-item">
+                        <a href="#" class="sidebar-link" onclick="showSection('categories')">
+                            📂 Catégories
+                        </a>
+                    </li>
+                    <li class="sidebar-item">
+                        <a href="#" class="sidebar-link" onclick="showSection('orders')">
+                            📦 Commandes
+                        </a>
+                    </li>
+                    <li class="sidebar-item">
+                        <a href="#" class="sidebar-link" onclick="showSection('customers')">
+                            👥 Clients
+                        </a>
+                    </li>
+                    <li class="sidebar-item">
+                        <a href="#" class="sidebar-link" onclick="showSection('low-stock')">
+                            ⚠️ Stock faible
+                        </a>
+                    </li>
+                    <li class="sidebar-item">
+                        <a href="#" class="sidebar-link" onclick="showSection('analytics')">
+                            📈 Analytics
+                        </a>
+                    </li>
+                    <li class="sidebar-item">
+                        <a href="#" class="sidebar-link" onclick="showSection('settings')">
+                            ⚙️ Paramètres
+                        </a>
+                    </li>
+                </ul>
+            </aside>
+
+            <!-- Main Content -->
+            <main class="admin-main">
+                <!-- Dashboard Section -->
+                <div class="dashboard-section active" id="dashboard-section">
+                    <h1 class="section-title">Tableau de bord</h1>
+                    
+                    <!-- Stats Cards -->
+                    <div class="stats-grid">
+                        <div class="stat-card">
+                            <div class="stat-icon">🛍️</div>
+                            <div class="stat-value" id="total-products">0</div>
+                            <div class="stat-label">Produits</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-icon">📦</div>
+                            <div class="stat-value" id="total-orders">0</div>
+                            <div class="stat-label">Commandes</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-icon">💰</div>
+                            <div class="stat-value" id="total-revenue">0 FCFA</div>
+                            <div class="stat-label">Revenus</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-icon">⚠️</div>
+                            <div class="stat-value" id="low-stock-items">0</div>
+                            <div class="stat-label">Stock faible</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-icon">⏳</div>
+                            <div class="stat-value" id="pending-orders">0</div>
+                            <div class="stat-label">Commandes en attente</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-icon">✅</div>
+                            <div class="stat-value" id="completed-orders">0</div>
+                            <div class="stat-label">Commandes livrées</div>
+                        </div>
+                    </div>
+                    
+                    <!-- Charts -->
+                    <div class="chart-container">
+                        <h3 class="chart-title">Ventes mensuelles</h3>
+                        <div class="chart" id="sales-chart"></div>
+                    </div>
+                    
+                    <div class="chart-container">
+                        <h3 class="chart-title">Répartition des catégories</h3>
+                        <div class="chart" id="categories-chart"></div>
+                    </div>
+                </div>
+
+                <!-- Products Section -->
+                <div class="dashboard-section" id="products-section">
+                    <h1 class="section-title">Gestion des produits</h1>
+                    
+                    <div class="products-header">
+                        <input type="text" placeholder="Rechercher des produits..." class="search-input" onkeyup="searchProducts(this.value)">
+                        <button class="add-product-btn" onclick="openAddProductModal()">+ Ajouter un produit</button>
+                    </div>
+                    
+                    <div class="products-table" id="products-table">
+                        <!-- Products table will be loaded here -->
+                    </div>
+                </div>
+
+                <!-- Categories Section -->
+                <div class="dashboard-section" id="categories-section">
+                    <h1 class="section-title">Gestion des catégories</h1>
+                    
+                    <div class="products-header">
+                        <input type="text" placeholder="Nom de la catégorie..." class="search-input" id="category-name-input">
+                        <button class="add-product-btn" onclick="openAddCategoryModal()">+ Ajouter une catégorie</button>
+                    </div>
+                    
+                    <div class="category-grid" id="categories-grid">
+                        <!-- Categories will be loaded here -->
+                    </div>
+                </div>
+
+                <!-- Orders Section -->
+                <div class="dashboard-section" id="orders-section">
+                    <h1 class="section-title">Gestion des commandes</h1>
+                    
+                    <div class="products-header">
+                        <input type="text" placeholder="Rechercher une commande..." class="search-input" onkeyup="searchOrders(this.value)">
+                        <select class="form-input" style="width: 200px;" onchange="filterOrdersByStatus(this.value)">
+                            <option value="all">Tous les statuts</option>
+                            <option value="pending">En attente</option>
+                            <option value="confirmed">Confirmée</option>
+                            <option value="shipped">Expédiée</option>
+                            <option value="delivered">Livrée</option>
+                            <option value="cancelled">Annulée</option>
+                        </select>
+                    </div>
+                    
+                    <div class="products-table" id="orders-table">
+                        <!-- Orders table will be loaded here -->
+                    </div>
+                </div>
+
+                <!-- Customers Section -->
+                <div class="dashboard-section" id="customers-section">
+                    <h1 class="section-title">Gestion des clients</h1>
+                    
+                    <div class="products-header">
+                        <input type="text" placeholder="Rechercher un client..." class="search-input" onkeyup="searchCustomers(this.value)">
+                    </div>
+                    
+                    <div class="products-table" id="customers-table">
+                        <!-- Customers table will be loaded here -->
+                    </div>
+                </div>
+
+                <!-- Low Stock Section -->
+                <div class="dashboard-section" id="low-stock-section">
+                    <h1 class="section-title">Produits en stock faible</h1>
+                    
+                    <div class="products-table" id="low-stock-table">
+                        <!-- Low stock products will be loaded here -->
+                    </div>
+                </div>
+
+                <!-- Analytics Section -->
+                <div class="dashboard-section" id="analytics-section">
+                    <h1 class="section-title">Analytics détaillées</h1>
+                    
+                    <div class="chart-container">
+                        <h3 class="chart-title">Évolution des ventes</h3>
+                        <div class="chart" id="detailed-sales-chart"></div>
+                    </div>
+                    
+                    <div class="chart-container">
+                        <h3 class="chart-title">Performance des produits</h3>
+                        <div class="chart" id="products-performance-chart"></div>
+                    </div>
+                </div>
+
+                <!-- Settings Section -->
+                <div class="dashboard-section" id="settings-section">
+                    <h1 class="section-title">Paramètres du site</h1>
+                    
+                    <div class="chart-container">
+                        <h3 class="chart-title">Informations de contact</h3>
+                        <div class="space-y-4">
+                            <div>
+                                <label class="form-label">Email</label>
+                                <input type="email" class="form-input" value="hadilasmakadji31@gmail.com" id="site-email">
+                            </div>
+                            <div>
+                                <label class="form-label">Téléphone</label>
+                                <input type="tel" class="form-input" value="+241 77 95 03 88" id="site-phone">
+                            </div>
+                            <div>
+                                <label class="form-label">Adresse</label>
+                                <textarea class="form-input form-textarea" id="site-address">Libreville, Gabon</textarea>
+                            </div>
+                            <button class="add-product-btn" onclick="saveSettings()">Enregistrer les modifications</button>
+                        </div>
+                    </div>
+                </div>
+            </main>
+        </div>
+    </div>
+
+    <!-- Add Product Modal -->
+    <div class="modal-overlay" id="add-product-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title" id="modal-title">Ajouter un produit</h2>
+                <button class="modal-close" onclick="closeAddProductModal()">&times;</button>
+            </div>
+            
+            <form id="add-product-form" onsubmit="handleAddProduct(event)">
+                <div class="form-row">
+                    <div class="form-group">
+                        <label class="form-label">Nom du produit</label>
+                        <input type="text" class="form-input" name="name" required>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Catégorie</label>
+                        <select class="form-input" name="category" required id="product-category-select">
+                            <option value="">Sélectionner une catégorie</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <div class="form-row">
+                    <div class="form-group">
+                        <label class="form-label">Prix (FCFA)</label>
+                        <input type="number" class="form-input" name="price" min="0" required>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Prix original (FCFA)</label>
+                        <input type="number" class="form-input" name="originalPrice" min="0">
+                    </div>
+                </div>
+                
+                <div class="form-row">
+                    <div class="form-group">
+                        <label class="form-label">Stock</label>
+                        <input type="number" class="form-input" name="stock" min="0" required>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Tailles (séparées par des virgules)</label>
+                        <input type="text" class="form-input" name="sizes" placeholder="S, M, L, XL">
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">Couleurs (séparées par des virgules)</label>
+                    <input type="text" class="form-input" name="colors" placeholder="Noir, Blanc, Rouge">
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">Description</label>
+                    <textarea class="form-input form-textarea" name="description" required></textarea>
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">Images du produit</label>
+                    <div class="image-upload" onclick="document.getElementById('image-input').click()">
+                        <div>📷 Cliquez pour ajouter des images</div>
+                        <div style="font-size: 0.9rem; color: #666; margin-top: 0.5rem;">
+                            Formats acceptés: JPG, PNG. Taille max: 5MB
+                        </div>
+                    </div>
+                    <input type="file" id="image-input" multiple accept="image/*" style="display: none;" onchange="handleImageUpload(event)">
+                    <div class="uploaded-images" id="uploaded-images"></div>
+                </div>
+                
+                <div class="form-row">
+                    <div class="form-group">
+                        <label class="form-label">
+                            <input type="checkbox" name="featured"> Produit vedette
+                        </label>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">
+                            <input type="checkbox" name="onSale"> En solde
+                        </label>
+                    </div>
+                </div>
+                
+                <button type="submit" class="add-product-btn">Ajouter le produit</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Add Category Modal -->
+    <div class="modal-overlay" id="add-category-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title">Ajouter une catégorie</h2>
+                <button class="modal-close" onclick="closeAddCategoryModal()">&times;</button>
+            </div>
+            
+            <form id="add-category-form" onsubmit="handleAddCategory(event)">
+                <div class="form-group">
+                    <label class="form-label">Nom de la catégorie</label>
+                    <input type="text" class="form-input" name="name" required>
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">Image de la catégorie</label>
+                    <div class="image-upload" onclick="document.getElementById('category-image-input').click()">
+                        <div>📷 Cliquez pour ajouter une image</div>
+                        <div style="font-size: 0.9rem; color: #666; margin-top: 0.5rem;">
+                            Formats acceptés: JPG, PNG. Taille max: 5MB
+                        </div>
+                    </div>
+                    <input type="file" id="category-image-input" accept="image/*" style="display: none;" onchange="handleCategoryImageUpload(event)">
+                    <div class="uploaded-images" id="category-uploaded-images"></div>
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">Sous-catégories (séparées par des virgules)</label>
+                    <input type="text" class="form-input" name="subcategories" placeholder="Sous-cat1, Sous-cat2, Sous-cat3">
+                </div>
+                
+                <button type="submit" class="add-product-btn">Ajouter la catégorie</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Order Details Modal -->
+    <div class="modal-overlay" id="order-details-modal">
+        <div class="modal-content order-details-modal">
+            <div class="modal-header">
+                <h2 class="modal-title">Détails de la commande</h2>
+                <button class="modal-close" onclick="closeOrderDetailsModal()">&times;</button>
+            </div>
+            <div id="order-details-content">
+                <!-- Order details will be loaded here -->
+            </div>
+        </div>
+    </div>
+
+    <!-- JavaScript -->
+    <script src="config.js"></script>
+    <script src="main.js"></script>
+    <script src="admin.js"></script>
+    
+    <script>
+        // Load settings on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            const settings = JSON.parse(localStorage.getItem('lamiti-settings') || '{}');
+            if (settings.email) document.getElementById('site-email').value = settings.email;
+            if (settings.phone) document.getElementById('site-phone').value = settings.phone;
+            if (settings.address) document.getElementById('site-address').value = settings.address;
+        });
+
+        function saveSettings() {
+            const email = document.getElementById('site-email').value;
+            const phone = document.getElementById('site-phone').value;
+            const address = document.getElementById('site-address').value;
+            
+            // Save to localStorage
+            const settings = { email, phone, address };
+            localStorage.setItem('lamiti-settings', JSON.stringify(settings));
+            
+            window.shop.showNotification('Paramètres enregistrés avec succès!', 'success');
+        }
+
+        function searchProducts(query) {
+            // Implement search functionality
+            console.log('Searching products:', query);
+        }
+        
+        function searchOrders(query) {
+            // Implement search functionality
+            console.log('Searching orders:', query);
+        }
+        
+        function searchCustomers(query) {
+            // Implement search functionality
+            console.log('Searching customers:', query);
+        }
+        
+        function filterOrdersByStatus(status) {
+            // Implement filter functionality
+            console.log('Filtering orders by status:', status);
+        }
+    </script>
+</body>
+</html>
