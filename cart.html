@@ -664,6 +664,70 @@
             border-radius: 6px;
             display: inline-block;
             margin: 0.5rem 0;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .tracking-code:hover {
+            background: var(--accent-color);
+            color: white;
+            transform: scale(1.05);
+        }
+        
+        .tracking-note {
+            font-size: 0.9rem;
+            color: #666;
+            margin-top: 1rem;
+        }
+        
+        /* Hamburger Button - AJOUTÉ */
+        .hamburger {
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            width: 30px;
+            height: 21px;
+            background: transparent;
+            border: none;
+            cursor: pointer;
+            padding: 0;
+            position: relative;
+            transition: all 0.3s ease;
+        }
+        
+        .hamburger-line {
+            display: block;
+            width: 100%;
+            height: 3px;
+            background-color: #10B981; /* Vert par défaut */
+            border-radius: 3px;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            transform-origin: center;
+        }
+        
+        /* État ouvert - transforme en X rouge */
+        .hamburger.open .hamburger-line:nth-child(1) {
+            transform: translateY(9px) rotate(45deg);
+            background-color: #EF4444; /* Rouge pour X */
+        }
+        
+        .hamburger.open .hamburger-line:nth-child(2) {
+            opacity: 0;
+            transform: scale(0);
+        }
+        
+        .hamburger.open .hamburger-line:nth-child(3) {
+            transform: translateY(-9px) rotate(-45deg);
+            background-color: #EF4444; /* Rouge pour X */
+        }
+        
+        /* Animation au hover */
+        .hamburger:hover .hamburger-line {
+            opacity: 0.8;
+        }
+        
+        .hamburger:active .hamburger-line {
+            opacity: 0.6;
         }
         
         /* Mobile Menu */
@@ -752,6 +816,78 @@
             padding: 0;
             margin-left: auto;
         }
+        
+        /* Real-time Updates */
+        .realtime-update {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: var(--accent-color);
+            color: white;
+            padding: 1rem 1.5rem;
+            border-radius: 8px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            transform: translateY(100px);
+            transition: transform 0.3s ease;
+            z-index: 2000;
+            max-width: 350px;
+            cursor: pointer;
+        }
+        
+        .realtime-update.show {
+            transform: translateY(0);
+        }
+        
+        .realtime-content {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+        
+        .realtime-close {
+            background: none;
+            border: none;
+            font-size: 1.2rem;
+            cursor: pointer;
+            color: white;
+            padding: 0;
+            margin-left: auto;
+        }
+        
+        /* Order Status Badges */
+        .status-badge {
+            display: inline-block;
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            text-align: center;
+        }
+        
+        .status-pending {
+            background: #fff3cd;
+            color: #856404;
+        }
+        
+        .status-confirmed {
+            background: #d4edda;
+            color: #155724;
+        }
+        
+        .status-shipped {
+            background: #cce5ff;
+            color: #004085;
+        }
+        
+        .status-delivered {
+            background: #d1ecf1;
+            color: #0c5460;
+        }
+        
+        .status-cancelled {
+            background: #f8d7da;
+            color: #721c24;
+        }
     </style>
 </head>
 <body>
@@ -769,7 +905,7 @@
                     <a href="index.html" class="nav-link">Accueil</a>
                     <a href="products.html" class="nav-link">Produits</a>
                     <a href="index.html#categories" class="nav-link">Catégories</a>
-                    <a href="index.html#contact" class="nav-link">Contact</a>
+                    <a href="track-order.html" class="nav-link">Suivi commande</a>
                     
                     <!-- Cart Icon -->
                     <a href="cart.html" class="cart-icon">
@@ -780,11 +916,11 @@
                     </a>
                 </div>
                 
-                <!-- Mobile Menu Button -->
-                <button class="md:hidden mobile-menu-btn" onclick="toggleMobileMenu()">
-                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
-                    </svg>
+                <!-- Hamburger Menu Button -->
+                <button class="hamburger md:hidden" onclick="toggleMobileMenu()" aria-label="Menu mobile" id="hamburger-btn">
+                    <span class="hamburger-line"></span>
+                    <span class="hamburger-line"></span>
+                    <span class="hamburger-line"></span>
                 </button>
             </div>
             
@@ -794,7 +930,7 @@
                     <a href="index.html" class="block px-3 py-2 nav-link">Accueil</a>
                     <a href="products.html" class="block px-3 py-2 nav-link">Produits</a>
                     <a href="index.html#categories" class="block px-3 py-2 nav-link">Catégories</a>
-                    <a href="index.html#contact" class="block px-3 py-2 nav-link">Contact</a>
+                    <a href="track-order.html" class="block px-3 py-2 nav-link">Suivi commande</a>
                     
                     <!-- Mobile Cart -->
                     <a href="cart.html" class="block px-3 py-2 nav-link">
@@ -879,6 +1015,8 @@
                             <option value="CM">Cameroun</option>
                             <option value="CG">Congo</option>
                             <option value="CF">République Centrafricaine</option>
+                            <option value="SN">Sénégal</option>
+                            <option value="CI">Côte d'Ivoire</option>
                         </select>
                     </div>
                 </div>
@@ -890,17 +1028,41 @@
                         <div class="payment-method" onclick="selectPaymentMethod('card')">
                             <div class="payment-method-icon">💳</div>
                             <div>Carte bancaire</div>
+                            <div class="text-sm text-gray-600 mt-1">Paiement sécurisé</div>
                         </div>
                         <div class="payment-method" onclick="selectPaymentMethod('mobile')">
                             <div class="payment-method-icon">📱</div>
                             <div>Paiement mobile</div>
+                            <div class="text-sm text-gray-600 mt-1">Orange Money, MTN Money</div>
                         </div>
                     </div>
                     <input type="hidden" name="paymentMethod" id="selected-payment-method" required>
                 </div>
                 
+                <!-- Order Notes -->
+                <div class="form-group">
+                    <label class="form-label">Notes pour la commande (optionnel)</label>
+                    <textarea class="form-input form-textarea" name="notes" placeholder="Instructions spéciales, préférences de livraison..."></textarea>
+                </div>
+                
+                <!-- Terms Agreement -->
+                <div class="form-group">
+                    <label class="form-label">
+                        <input type="checkbox" name="terms" required>
+                        J'accepte les <a href="#" class="text-accent-color hover:underline">conditions générales de vente</a>
+                    </label>
+                </div>
+                
                 <button type="submit" class="checkout-btn">Confirmer la commande</button>
             </form>
+        </div>
+    </div>
+
+    <!-- Real-time Update Notification -->
+    <div class="realtime-update" id="realtime-update" onclick="goToTracking()">
+        <div class="realtime-content">
+            <span>📦 Mise à jour de commande disponible</span>
+            <button class="realtime-close" onclick="hideRealtimeUpdate(event)">&times;</button>
         </div>
     </div>
 
@@ -911,25 +1073,25 @@
     <script>
         let selectedPaymentMethod = null;
         let currentOrder = null;
+        let realtimeUpdateInterval = null;
+        let lastOrderCheck = Date.now();
         
         // Initialize cart page
         document.addEventListener('DOMContentLoaded', function() {
             loadCartPage();
             
-            // Mobile menu toggle
-            const mobileMenuBtn = document.querySelector('.mobile-menu-btn');
-            const mobileMenu = document.getElementById('mobile-menu');
-            
-            if (mobileMenuBtn && mobileMenu) {
-                mobileMenuBtn.addEventListener('click', function() {
-                    mobileMenu.classList.toggle('active');
-                });
-            }
-            
             // Listen for cart updates
             document.addEventListener('shopDataUpdate', function() {
                 loadCartPage();
             });
+            
+            // Listen for order status updates
+            document.addEventListener('orderStatusUpdated', function(e) {
+                showRealtimeUpdate(e.detail);
+            });
+            
+            // Check for existing orders updates
+            startOrderUpdatesCheck();
         });
         
         function loadCartPage() {
@@ -965,13 +1127,13 @@
                             return `
                                 <div class="cart-item" data-item-id="${item.productId}">
                                     <div class="cart-item-image">
-                                        <img src="${product.images[0]}" alt="${product.name}">
+                                        <img src="${product.images[0]}" alt="${product.name}" loading="lazy">
                                     </div>
                                     <div class="cart-item-details">
                                         <h3 class="cart-item-name">${product.name}</h3>
                                         <div class="cart-item-options">
-                                            ${item.size ? `Taille: ${item.size}` : ''}
-                                            ${item.color ? `Couleur: ${item.color}` : ''}
+                                            ${item.size ? `<span class="mr-3">Taille: ${item.size}</span>` : ''}
+                                            ${item.color ? `<span>Couleur: ${item.color}</span>` : ''}
                                         </div>
                                         <div class="cart-item-price">${window.shop.formatPrice(product.price)}</div>
                                     </div>
@@ -1019,6 +1181,13 @@
                             <span>Total</span>
                             <span id="total">${window.shop.formatPrice(window.shop.calculateTotal() * 1.18)}</span>
                         </div>
+                        
+                        <div class="mt-4 mb-2 text-sm text-gray-600">
+                            <p>✓ Livraison gratuite sur toutes les commandes</p>
+                            <p>✓ Paiement 100% sécurisé</p>
+                            <p>✓ Retours gratuits sous 30 jours</p>
+                        </div>
+                        
                         <button class="checkout-btn" onclick="openCheckoutModal()" ${window.shop.cart.length === 0 ? 'disabled' : ''}>
                             Procéder au paiement
                         </button>
@@ -1115,6 +1284,7 @@
             };
             
             const paymentMethod = formData.get('paymentMethod');
+            const notes = formData.get('notes');
             
             // Show loading state
             const submitBtn = event.target.querySelector('button[type="submit"]');
@@ -1127,9 +1297,23 @@
                 const order = window.shop.createOrder(customerInfo, shippingAddress, paymentMethod);
                 
                 if (order) {
+                    // Add notes to order if provided
+                    if (notes) {
+                        order.notes = notes;
+                        window.shop.saveOrders();
+                    }
+                    
                     currentOrder = order;
                     closeCheckoutModal();
                     showOrderConfirmation(order);
+                    
+                    // Store customer session
+                    window.shop.currentUser = {
+                        email: customerInfo.email,
+                        firstName: customerInfo.firstName,
+                        lastName: customerInfo.lastName
+                    };
+                    localStorage.setItem('lamiti-user', JSON.stringify(window.shop.currentUser));
                 } else {
                     window.shop.showNotification('Erreur lors de la création de la commande', 'error');
                 }
@@ -1160,23 +1344,34 @@
                             <span>Mode de paiement:</span>
                             <span>${order.paymentMethod === 'card' ? 'Carte bancaire' : 'Paiement mobile'}</span>
                         </div>
+                        <div class="detail-row">
+                            <span>Statut:</span>
+                            <span class="status-badge status-${order.status}">
+                                ${window.shop.getStatusLabel(order.status)}
+                            </span>
+                        </div>
                     </div>
                     
                     <div class="tracking-section">
                         <h3>Suivi de commande</h3>
                         <p>Utilisez ce code pour suivre votre commande:</p>
-                        <div class="tracking-code">${order.trackingCode}</div>
-                        <p class="text-sm text-gray-600 mt-2">
+                        <div class="tracking-code" onclick="copyTrackingCode('${order.trackingCode}')">
+                            ${order.trackingCode}
+                        </div>
+                        <p class="tracking-note">
                             Livraison estimée: ${new Date(order.estimatedDelivery).toLocaleDateString('fr-FR')}
                         </p>
                     </div>
                     
                     <div class="space-y-4">
-                        <button onclick="trackOrder('${order.trackingCode}')" class="shop-now-btn w-full">
-                            Suivre ma commande
+                        <button onclick="window.location.href='track-order.html?code=${order.trackingCode}'" class="shop-now-btn w-full">
+                            📦 Suivre ma commande en temps réel
                         </button>
-                        <a href="index.html" class="block text-center text-gray-600 hover:text-gray-800 transition-colors">
-                            Retour à l'accueil
+                        <button onclick="printOrderDetails('${order.id}')" class="shop-now-btn w-full bg-gray-700 hover:bg-gray-800">
+                            🖨️ Imprimer les détails
+                        </button>
+                        <a href="products.html" class="block text-center text-gray-600 hover:text-gray-800 transition-colors">
+                            ← Retour à la boutique
                         </a>
                     </div>
                 </div>
@@ -1195,39 +1390,344 @@
                     easing: 'easeOutExpo'
                 });
             }
+            
+            // Start checking for order updates
+            startOrderTracking(order.id);
+        }
+        
+        function copyTrackingCode(code) {
+            navigator.clipboard.writeText(code).then(() => {
+                window.shop.showNotification('Code copié dans le presse-papier!', 'success');
+            }).catch(err => {
+                console.error('Erreur de copie:', err);
+            });
+        }
+        
+        function printOrderDetails(orderId) {
+            const order = window.shop.orders.find(o => o.id === orderId);
+            if (!order) return;
+            
+            const printContent = `
+                <!DOCTYPE html>
+                <html>
+                <head>
+                    <title>Confirmation de commande - LAMITI SHOP</title>
+                    <style>
+                        body { font-family: Arial, sans-serif; padding: 20px; max-width: 800px; margin: 0 auto; }
+                        .header { text-align: center; margin-bottom: 30px; }
+                        .logo { font-family: 'Playfair Display', serif; font-size: 2rem; font-weight: bold; color: #1a1a1a; }
+                        .order-info { margin-bottom: 20px; }
+                        .section { margin-bottom: 25px; }
+                        .section-title { font-weight: bold; border-bottom: 2px solid #d4af37; padding-bottom: 5px; margin-bottom: 10px; }
+                        .info-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
+                        .items-table { width: 100%; border-collapse: collapse; margin-top: 10px; }
+                        .items-table th, .items-table td { padding: 10px; text-align: left; border-bottom: 1px solid #ddd; }
+                        .total-row { font-weight: bold; border-top: 2px solid #000; }
+                        .footer { margin-top: 30px; text-align: center; font-size: 0.9rem; color: #666; }
+                        .tracking-code { font-family: monospace; font-weight: bold; color: #d4af37; }
+                        @media print {
+                            .no-print { display: none; }
+                            body { padding: 0; }
+                        }
+                    </style>
+                </head>
+                <body>
+                    <div class="no-print" style="text-align: center; margin-bottom: 20px;">
+                        <button onclick="window.print()" style="padding: 10px 20px; background: #d4af37; color: white; border: none; border-radius: 5px; cursor: pointer;">
+                            Imprimer
+                        </button>
+                        <button onclick="window.close()" style="padding: 10px 20px; background: #666; color: white; border: none; border-radius: 5px; cursor: pointer; margin-left: 10px;">
+                            Fermer
+                        </button>
+                    </div>
+                    
+                    <div class="header">
+                        <div class="logo">LAMITI SHOP</div>
+                        <h1>Confirmation de commande</h1>
+                    </div>
+                    
+                    <div class="order-info">
+                        <div class="info-grid">
+                            <div>
+                                <strong>Numéro de commande:</strong><br>
+                                ${order.id}
+                            </div>
+                            <div>
+                                <strong>Date:</strong><br>
+                                ${new Date(order.orderDate).toLocaleDateString('fr-FR')}
+                            </div>
+                            <div>
+                                <strong>Code de suivi:</strong><br>
+                                <span class="tracking-code">${order.trackingCode}</span>
+                            </div>
+                            <div>
+                                <strong>Statut:</strong><br>
+                                ${window.shop.getStatusLabel(order.status)}
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="section">
+                        <div class="section-title">Informations client</div>
+                        <div class="info-grid">
+                            <div>
+                                <strong>Nom:</strong><br>
+                                ${order.customer.firstName} ${order.customer.lastName}
+                            </div>
+                            <div>
+                                <strong>Contact:</strong><br>
+                                ${order.customer.email}<br>
+                                ${order.customer.phone}
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="section">
+                        <div class="section-title">Adresse de livraison</div>
+                        <p>${order.shippingAddress.address}</p>
+                        <p>${order.shippingAddress.city}, ${order.shippingAddress.zipCode}</p>
+                        <p>${order.shippingAddress.country}</p>
+                    </div>
+                    
+                    <div class="section">
+                        <div class="section-title">Articles commandés</div>
+                        <table class="items-table">
+                            <thead>
+                                <tr>
+                                    <th>Article</th>
+                                    <th>Quantité</th>
+                                    <th>Prix unitaire</th>
+                                    <th>Total</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                ${order.items.map(item => {
+                                    const product = window.shop.products.find(p => p.id === item.productId);
+                                    return `
+                                        <tr>
+                                            <td>${product ? product.name : 'Produit'}</td>
+                                            <td>${item.quantity}</td>
+                                            <td>${window.shop.formatPrice(product ? product.price : 0)}</td>
+                                            <td>${window.shop.formatPrice(product ? product.price * item.quantity : 0)}</td>
+                                        </tr>
+                                    `;
+                                }).join('')}
+                                <tr class="total-row">
+                                    <td colspan="3">Sous-total</td>
+                                    <td>${window.shop.formatPrice(order.total)}</td>
+                                </tr>
+                                <tr class="total-row">
+                                    <td colspan="3">Taxes (18%)</td>
+                                    <td>${window.shop.formatPrice(order.total * 0.18)}</td>
+                                </tr>
+                                <tr class="total-row">
+                                    <td colspan="3">Total</td>
+                                    <td>${window.shop.formatPrice(order.total * 1.18)}</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    
+                    <div class="section">
+                        <div class="section-title">Informations de paiement</div>
+                        <p><strong>Mode de paiement:</strong> ${order.paymentMethod === 'card' ? 'Carte bancaire' : 'Paiement mobile'}</p>
+                        <p><strong>Livraison estimée:</strong> ${new Date(order.estimatedDelivery).toLocaleDateString('fr-FR')}</p>
+                    </div>
+                    
+                    <div class="footer">
+                        <p>Merci pour votre commande !</p>
+                        <p>Suivez votre commande en ligne: https://lamiti-shop.com/track-order.html?code=${order.trackingCode}</p>
+                        <p>Contact: hadilasmakadji31@gmail.com | +241 77 95 03 88</p>
+                    </div>
+                </body>
+                </html>
+            `;
+            
+            const printWindow = window.open('', '_blank');
+            printWindow.document.write(printContent);
+            printWindow.document.close();
+            printWindow.focus();
+            setTimeout(() => {
+                printWindow.print();
+            }, 500);
         }
         
         function trackOrder(trackingCode) {
-            // Simulate order tracking
-            const order = window.shop.getOrderByTrackingCode(trackingCode);
-            if (order) {
-                let statusMessage = '';
-                switch (order.status) {
-                    case 'pending':
-                        statusMessage = 'Votre commande est en cours de traitement.';
-                        break;
-                    case 'confirmed':
-                        statusMessage = 'Votre commande a été confirmée et est en préparation.';
-                        break;
-                    case 'shipped':
-                        statusMessage = 'Votre commande a été expédiée et est en cours de livraison.';
-                        break;
-                    case 'delivered':
-                        statusMessage = 'Votre commande a été livrée avec succès!';
-                        break;
-                    default:
-                        statusMessage = 'Statut de commande inconnu.';
+            if (window.shop) {
+                const order = window.shop.getOrderByTrackingCode(trackingCode);
+                if (order) {
+                    let statusMessage = '';
+                    let statusEmoji = '';
+                    
+                    switch (order.status) {
+                        case 'pending':
+                            statusMessage = 'Votre commande est en cours de traitement.';
+                            statusEmoji = '⏳';
+                            break;
+                        case 'confirmed':
+                            statusMessage = 'Votre commande a été confirmée et est en préparation.';
+                            statusEmoji = '✅';
+                            break;
+                        case 'shipped':
+                            statusMessage = 'Votre commande a été expédiée et est en cours de livraison.';
+                            statusEmoji = '🚚';
+                            break;
+                        case 'delivered':
+                            statusMessage = 'Votre commande a été livrée avec succès!';
+                            statusEmoji = '🎉';
+                            break;
+                        case 'cancelled':
+                            statusMessage = 'Votre commande a été annulée.';
+                            statusEmoji = '❌';
+                            break;
+                        default:
+                            statusMessage = 'Statut de commande inconnu.';
+                            statusEmoji = '❓';
+                    }
+                    
+                    window.shop.showNotification(`${statusEmoji} ${statusMessage}`, 'info');
+                    
+                    // Redirect to tracking page
+                    window.location.href = `track-order.html?code=${trackingCode}`;
+                } else {
+                    window.shop.showNotification('Commande introuvable.', 'error');
                 }
-                
-                window.shop.showNotification(`Suivi: ${statusMessage}`, 'info');
-            } else {
-                window.shop.showNotification('Commande introuvable.', 'error');
             }
+        }
+        
+        function startOrderTracking(orderId) {
+            // Check for updates every 30 seconds
+            realtimeUpdateInterval = setInterval(() => {
+                checkOrderUpdate(orderId);
+            }, 30000);
+        }
+        
+        function checkOrderUpdate(orderId) {
+            if (!window.shop) return;
+            
+            const order = window.shop.orders.find(o => o.id === orderId);
+            if (!order) return;
+            
+            // Check for new status updates
+            if (order.updates && order.updates.length > 0) {
+                const lastSeenUpdate = localStorage.getItem(`lamiti-last-update-${orderId}`) || 0;
+                const newUpdates = order.updates.filter(update => 
+                    new Date(update.timestamp).getTime() > lastSeenUpdate
+                );
+                
+                if (newUpdates.length > 0) {
+                    // Show real-time update notification
+                    const latestUpdate = newUpdates[newUpdates.length - 1];
+                    showRealtimeUpdate({
+                        orderId: orderId,
+                        newStatus: latestUpdate.newStatus,
+                        message: latestUpdate.message
+                    });
+                    
+                    // Update last seen
+                    localStorage.setItem(`lamiti-last-update-${orderId}`, 
+                        new Date(latestUpdate.timestamp).getTime());
+                }
+            }
+        }
+        
+        function startOrderUpdatesCheck() {
+            // Check for all customer orders updates every minute
+            setInterval(() => {
+                checkAllOrderUpdates();
+            }, 60000);
+            
+            // Initial check
+            setTimeout(() => {
+                checkAllOrderUpdates();
+            }, 5000);
+        }
+        
+        function checkAllOrderUpdates() {
+            if (!window.shop) return;
+            
+            const customerEmail = window.shop.currentUser?.email;
+            if (!customerEmail) return;
+            
+            const customerOrders = window.shop.getCustomerOrders(customerEmail);
+            
+            customerOrders.forEach(order => {
+                if (order.updates && order.updates.length > 0) {
+                    const lastSeenUpdate = localStorage.getItem(`lamiti-last-update-${order.id}`) || 0;
+                    const newUpdates = order.updates.filter(update => 
+                        new Date(update.timestamp).getTime() > lastSeenUpdate
+                    );
+                    
+                    if (newUpdates.length > 0) {
+                        const latestUpdate = newUpdates[newUpdates.length - 1];
+                        showRealtimeUpdate({
+                            orderId: order.id,
+                            newStatus: latestUpdate.newStatus,
+                            message: latestUpdate.message
+                        });
+                    }
+                }
+            });
+        }
+        
+        function showRealtimeUpdate(update) {
+            const updateElement = document.getElementById('realtime-update');
+            if (updateElement) {
+                updateElement.querySelector('span').textContent = `📦 ${update.message}`;
+                updateElement.classList.add('show');
+                
+                // Auto-hide after 10 seconds
+                setTimeout(() => {
+                    hideRealtimeUpdate();
+                }, 10000);
+            }
+        }
+        
+        function hideRealtimeUpdate(event) {
+            if (event) {
+                event.stopPropagation();
+            }
+            const updateElement = document.getElementById('realtime-update');
+            if (updateElement) {
+                updateElement.classList.remove('show');
+            }
+        }
+        
+        function goToTracking() {
+            const updateElement = document.getElementById('realtime-update');
+            const text = updateElement.querySelector('span').textContent;
+            
+            // Extract order ID from message
+            const orderIdMatch = text.match(/commande\s+([A-Z0-9-]+)/i);
+            if (orderIdMatch && orderIdMatch[1]) {
+                const orderId = orderIdMatch[1];
+                const order = window.shop.orders.find(o => o.id === orderId);
+                if (order) {
+                    window.location.href = `track-order.html?code=${order.trackingCode}`;
+                }
+            } else {
+                window.location.href = 'track-order.html';
+            }
+            
+            hideRealtimeUpdate();
         }
         
         function toggleMobileMenu() {
             const mobileMenu = document.getElementById('mobile-menu');
+            const hamburgerBtn = document.getElementById('hamburger-btn');
+            
             mobileMenu.classList.toggle('active');
+            hamburgerBtn.classList.toggle('open');
+            
+            // Fermer le menu si on clique sur un lien
+            if (mobileMenu.classList.contains('active')) {
+                mobileMenu.querySelectorAll('.nav-link').forEach(link => {
+                    link.addEventListener('click', () => {
+                        mobileMenu.classList.remove('active');
+                        hamburgerBtn.classList.remove('open');
+                    });
+                });
+            }
         }
         
         // Close modal when clicking outside
@@ -1248,6 +1748,10 @@
         window.addEventListener('beforeunload', function() {
             if (window.shop) {
                 window.shop.saveCart();
+            }
+            
+            if (realtimeUpdateInterval) {
+                clearInterval(realtimeUpdateInterval);
             }
         });
     </script>
