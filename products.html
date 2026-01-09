@@ -556,6 +556,56 @@
             margin-bottom: 2rem;
         }
         
+        /* Hamburger Button - AJOUTÉ */
+        .hamburger {
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            width: 30px;
+            height: 21px;
+            background: transparent;
+            border: none;
+            cursor: pointer;
+            padding: 0;
+            position: relative;
+            transition: all 0.3s ease;
+        }
+        
+        .hamburger-line {
+            display: block;
+            width: 100%;
+            height: 3px;
+            background-color: #10B981; /* Vert par défaut */
+            border-radius: 3px;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            transform-origin: center;
+        }
+        
+        /* État ouvert - transforme en X rouge */
+        .hamburger.open .hamburger-line:nth-child(1) {
+            transform: translateY(9px) rotate(45deg);
+            background-color: #EF4444; /* Rouge pour X */
+        }
+        
+        .hamburger.open .hamburger-line:nth-child(2) {
+            opacity: 0;
+            transform: scale(0);
+        }
+        
+        .hamburger.open .hamburger-line:nth-child(3) {
+            transform: translateY(-9px) rotate(-45deg);
+            background-color: #EF4444; /* Rouge pour X */
+        }
+        
+        /* Animation au hover */
+        .hamburger:hover .hamburger-line {
+            opacity: 0.8;
+        }
+        
+        .hamburger:active .hamburger-line {
+            opacity: 0.6;
+        }
+        
         /* Mobile Menu */
         .mobile-menu-btn {
             display: none;
@@ -803,11 +853,11 @@
                     </a>
                 </div>
                 
-                <!-- Mobile Menu Button -->
-                <button class="md:hidden mobile-menu-btn" onclick="toggleMobileMenu()">
-                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
-                    </svg>
+                <!-- Hamburger Menu Button -->
+                <button class="hamburger md:hidden" onclick="toggleMobileMenu()" aria-label="Menu mobile" id="hamburger-btn">
+                    <span class="hamburger-line"></span>
+                    <span class="hamburger-line"></span>
+                    <span class="hamburger-line"></span>
                 </button>
             </div>
             
@@ -1031,16 +1081,6 @@
             
             // Load products
             loadProducts();
-            
-            // Mobile menu toggle
-            const mobileMenuBtn = document.querySelector('.mobile-menu-btn');
-            const mobileMenu = document.getElementById('mobile-menu');
-            
-            if (mobileMenuBtn && mobileMenu) {
-                mobileMenuBtn.addEventListener('click', function() {
-                    mobileMenu.classList.toggle('active');
-                });
-            }
             
             // Search input enter key
             const searchInput = document.getElementById('search-input');
@@ -1534,7 +1574,20 @@
         
         function toggleMobileMenu() {
             const mobileMenu = document.getElementById('mobile-menu');
+            const hamburgerBtn = document.getElementById('hamburger-btn');
+            
             mobileMenu.classList.toggle('active');
+            hamburgerBtn.classList.toggle('open');
+            
+            // Fermer le menu si on clique sur un lien
+            if (mobileMenu.classList.contains('active')) {
+                mobileMenu.querySelectorAll('.nav-link').forEach(link => {
+                    link.addEventListener('click', () => {
+                        mobileMenu.classList.remove('active');
+                        hamburgerBtn.classList.remove('open');
+                    });
+                });
+            }
         }
         
         // Close modal when clicking outside
